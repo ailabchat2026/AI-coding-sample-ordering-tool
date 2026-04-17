@@ -1004,16 +1004,21 @@ button {
 }
 
 /* =========================================================
-   FAB (Today's orders)
+   FAB (cart + orders)
    ========================================================= */
 .fab-wrap {
     position: fixed;
     right: max(16px, env(safe-area-inset-right));
     bottom: max(20px, env(safe-area-inset-bottom));
     z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
 }
 
 .fab {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -1037,6 +1042,94 @@ button {
 
 .fab:active {
     transform: translateY(0);
+}
+
+.fab-ghost {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--border-strong);
+    font-size: 13px;
+    padding: 10px 18px;
+    min-height: 44px;
+}
+
+.fab-ghost:hover {
+    background: var(--bg-2);
+    border-color: var(--ink);
+    transform: translateY(-2px);
+}
+
+.fab-badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 2px var(--surface);
+    pointer-events: none;
+}
+
+/* Cart list inside modal */
+.cart-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.cart-item:last-child {
+    border-bottom: 0;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-item-meta {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-item-price {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 /* =========================================================
@@ -1302,12 +1395,16 @@ button {
         grid-template-columns: 1fr;
     }
 
-    .fab span {
+    .fab span:not(.fab-badge) {
         display: none;
     }
 
     .fab {
         padding: 14px;
+    }
+
+    .fab-ghost {
+        padding: 12px;
     }
 }
 

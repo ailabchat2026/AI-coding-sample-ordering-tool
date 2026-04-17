@@ -80,6 +80,10 @@
                 <circle cx="11" cy="11" r="7" />
                 <path d="M21 21l-4.3-4.3" />
             </symbol>
+            <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+            </symbol>
         </defs>
     </svg>
 
@@ -206,14 +210,48 @@
             </section>
         </main>
 
-        <!-- 底部浮動訂單按鈕 -->
+        <!-- 底部浮動按鈕群 -->
         <section id="order-summary-section" class="fab-wrap hidden">
-            <button id="btn-show-orders" class="fab">
+            <button id="btn-show-orders" class="fab fab-ghost">
+                <svg class="icon"><use href="#i-list" /></svg>
+                <span>今日訂單</span>
+            </button>
+            <button id="btn-show-cart" class="fab">
                 <svg class="icon"><use href="#i-cart" /></svg>
-                <span>今日訂單總覽</span>
+                <span>購物車</span>
+                <span id="cart-badge" class="fab-badge hidden" aria-live="polite">0</span>
             </button>
         </section>
 
+    </div>
+
+    <!-- 購物車 Modal -->
+    <div id="cart-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-sheet">
+            <header class="modal-head">
+                <div>
+                    <span class="eyebrow">My Order</span>
+                    <h2 id="cart-modal-title" class="modal-title">購物車</h2>
+                </div>
+                <button class="icon-btn close-cart-modal" aria-label="關閉">
+                    <svg class="icon"><use href="#i-close" /></svg>
+                </button>
+            </header>
+            <div class="modal-body" id="cart-body">
+                <!-- JS 動態生成 -->
+            </div>
+            <footer class="modal-foot">
+                <div class="total-box">
+                    <span class="total-label">小計</span>
+                    <span class="total-value">NT$ <span id="cart-total">0</span></span>
+                </div>
+                <button id="btn-confirm-cart" class="btn btn-primary" disabled>
+                    <svg class="icon icon-sm"><use href="#i-check" /></svg>
+                    確認送出
+                </button>
+            </footer>
+        </div>
     </div>
 
     <!-- 訂單列表 Modal -->

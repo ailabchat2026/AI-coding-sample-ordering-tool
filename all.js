@@ -25,6 +25,7 @@ let state = {
     allMenu: [],
     selectedRestaurant: null,
     menuFilter: { keyword: '', category: 'all' },
+    cart: [],
 };
 
 const SHEETS = {
@@ -44,7 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-save-config').addEventListener('click', saveTodayConfig);
     document.getElementById('btn-clear-orders').addEventListener('click', clearOrders);
     document.getElementById('btn-show-orders').addEventListener('click', openOrdersModal);
+    document.getElementById('btn-show-cart').addEventListener('click', openCartModal);
+    document.getElementById('btn-confirm-cart').addEventListener('click', confirmCart);
     document.getElementById('btn-copy-orders').addEventListener('click', copyOrdersToClipboard);
+
+    document.querySelectorAll('.close-cart-modal').forEach(b => b.addEventListener('click', closeCartModal));
+    document.querySelector('#cart-modal .modal-backdrop').addEventListener('click', closeCartModal);
     document.getElementById('btn-back-restaurants').addEventListener('click', goToRestaurantsView);
 
     // 菜單搜尋
@@ -76,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Esc 關閉 modal
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !document.getElementById('orders-modal').classList.contains('hidden')) {
-            closeOrdersModal();
-        }
+        if (e.key !== 'Escape') return;
+        if (!document.getElementById('orders-modal').classList.contains('hidden')) closeOrdersModal();
+        if (!document.getElementById('cart-modal').classList.contains('hidden')) closeCartModal();
     });
 
     initGapiClient().then(() => {
@@ -500,45 +506,130 @@ function renderMenuItems() {
                 <button class="btn-order">加入訂單</button>
             </div>
         `;
-        card.querySelector('.btn-order').addEventListener('click', (e) => {
-            submitOrder(item.restaurant, item.name, item.price, e.currentTarget);
+        const btn = card.querySelector('.btn-order');
+        btn.textContent = '加入購物車';
+        btn.addEventListener('click', () => {
+            const note = card.querySelector('.note-input').value.trim();
+            addToCart(item.restaurant, item.name, item.price, note, btn);
+            card.querySelector('.note-input').value = '';
         });
         container.appendChild(card);
     });
 }
 
-async function submitOrder(restaurant, foodName, price, btnElement) {
-    if (!currentUser) return;
+// --- 購物車 ---
 
-    const card = btnElement.closest('.menu-item');
-    const note = card.querySelector('.note-input').value.trim();
-    const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
+function addToCart(restaurant, name, price, note, btnElement) {
+    state.cart.push({ id: Date.now() + Math.random(), restaurant, name, price, note });
+    updateCartBadge();
 
     btnElement.disabled = true;
-    btnElement.textContent = '送出中…';
+    btnElement.textContent = '已加入 ✓';
+    setTimeout(() => {
+        btnElement.disabled = false;
+        btnElement.textContent = '加入購物車';
+    }, 800);
+
+    toast(`已加入購物車：${name}`, 'ok');
+}
+
+function updateCartBadge() {
+    const badge = document.getElementById('cart-badge');
+    const count = state.cart.length;
+    badge.textContent = count;
+    badge.classList.toggle('hidden', count === 0);
+}
+
+function openCartModal() {
+    renderCartItems();
+    document.getElementById('cart-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCartModal() {
+    document.getElementById('cart-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function renderCartItems() {
+    const body = document.getElementById('cart-body');
+    const confirmBtn = document.getElementById('btn-confirm-cart');
+    const totalEl = document.getElementById('cart-total');
+
+    if (state.cart.length === 0) {
+        body.innerHTML = `<div class="empty" style="border:none;padding:40px 24px">
+            <h3>購物車是空的</h3>
+            <p>回菜單選擇餐點，點「加入購物車」。</p>
+        </div>`;
+        confirmBtn.disabled = true;
+        totalEl.textContent = '0';
+        return;
+    }
+
+    const total = state.cart.reduce((sum, item) => sum + (parseInt(item.price) || 0), 0);
+    totalEl.textContent = total;
+    confirmBtn.disabled = false;
+
+    const ul = document.createElement('ul');
+    ul.className = 'cart-list';
+
+    state.cart.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'cart-item';
+        const metaParts = [escapeHtml(item.restaurant)];
+        if (item.note) metaParts.push(escapeHtml(item.note));
+        li.innerHTML = `
+            <div class="cart-item-info">
+                <span class="cart-item-name">${escapeHtml(item.name)}</span>
+                <span class="cart-item-meta">${metaParts.join(' · ')}</span>
+            </div>
+            <span class="cart-item-price">NT$ ${escapeHtml(String(item.price))}</span>
+            <button class="icon-btn" aria-label="移除 ${escapeHtml(item.name)}" style="color:var(--danger)">
+                <svg class="icon icon-sm"><use href="#i-trash" /></svg>
+            </button>
+        `;
+        li.querySelector('.icon-btn').addEventListener('click', () => {
+            state.cart = state.cart.filter(c => c.id !== item.id);
+            updateCartBadge();
+            renderCartItems();
+        });
+        ul.appendChild(li);
+    });
+
+    body.innerHTML = '';
+    body.appendChild(ul);
+}
+
+async function confirmCart() {
+    if (state.cart.length === 0) return;
+
+    const btn = document.getElementById('btn-confirm-cart');
+    btn.disabled = true;
+    btn.textContent = '送出中…';
+
+    const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
+    const values = state.cart.map(item => [
+        timestamp, currentUser.email, item.restaurant, item.name, item.price, item.note
+    ]);
 
     try {
         await gapi.client.sheets.spreadsheets.values.append({
             spreadsheetId: CONFIG.SPREADSHEET_ID,
             range: `${SHEETS.ORDERS}!A:F`,
             valueInputOption: 'USER_ENTERED',
-            resource: {
-                values: [[timestamp, currentUser.email, restaurant, foodName, price, note]]
-            }
+            resource: { values }
         });
 
-        toast(`已加入訂單：${foodName}`, 'ok');
-        card.querySelector('.note-input').value = '';
-        btnElement.textContent = '已加入 ✓';
-        setTimeout(() => {
-            btnElement.disabled = false;
-            btnElement.textContent = '加入訂單';
-        }, 1200);
+        const count = state.cart.length;
+        state.cart = [];
+        updateCartBadge();
+        closeCartModal();
+        toast(`已成功送出 ${count} 筆訂單！`, 'ok');
     } catch (err) {
-        console.error("Order failed", err);
-        toast('點餐失敗，請重試。', 'err');
-        btnElement.disabled = false;
-        btnElement.textContent = '加入訂單';
+        console.error('Cart submit failed', err);
+        toast('送出失敗，請重試。', 'err');
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="icon icon-sm"><use href="#i-check" /></svg> 確認送出`;
     }
 }
 
