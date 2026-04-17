@@ -4,107 +4,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公司內部點餐工具</title>
+    <title>Tasty — 公司午餐訂購</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="all.css">
-    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Google API Client -->
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 
 <body>
+    <!-- SVG 圖示定義 -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="i-bowl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 11h18a9 9 0 0 1-18 0Z" />
+                <path d="M2 20h20" />
+                <path d="M10 4c0 1 .5 1.5.5 2.5S10 8 10 8" />
+                <path d="M14 4c0 1 .5 1.5.5 2.5S14 8 14 8" />
+            </symbol>
+            <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+            </symbol>
+            <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="20" r="1.5" />
+                <circle cx="18" cy="20" r="1.5" />
+                <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 7H6" />
+            </symbol>
+            <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                    d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.5 15a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8L4.2 7a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+            </symbol>
+            <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </symbol>
+            <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+            </symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            </symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+            </symbol>
+            <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="M16 17l5-5-5-5" />
+                <path d="M21 12H9" />
+            </symbol>
+            <symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l1.5-5h15L21 9" />
+                <path d="M3 9v11h18V9" />
+                <path d="M8 9v11M16 9v11" />
+            </symbol>
+            <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </symbol>
+            <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.3-4.3" />
+            </symbol>
+        </defs>
+    </svg>
 
-    <div class="container">
-        <header>
-            <h1>🍱 公司點餐系統</h1>
-            <div id="user-info" class="hidden">
-                <span id="user-name"></span>
-                <button id="sign-out-btn" class="btn btn-outline">登出</button>
+    <div class="page">
+
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg class="icon icon-lg"><use href="#i-bowl" /></svg>
+                </span>
+                <div class="brand-text">
+                    <span class="brand-name">Tasty</span>
+                    <span class="brand-sub">公司午餐訂購</span>
+                </div>
+            </div>
+            <div id="user-info" class="user-info hidden">
+                <span class="user-avatar" aria-hidden="true"></span>
+                <span id="user-name" class="user-name"></span>
+                <button id="sign-out-btn" class="icon-btn" aria-label="登出" title="登出">
+                    <svg class="icon"><use href="#i-logout" /></svg>
+                </button>
             </div>
         </header>
+
         <!-- 登入區塊 -->
-        <section id="login-section">
-            <div class="card login-card">
-                <h2>請先登入</h2>
-                <p>使用公司 Google 帳號登入以進行點餐</p>
-                <button id="custom-login-btn" class="custom-google-btn">
-                    <span class="icon"></span>
-                    <span class="text">使用 Google 帳號登入</span>
+        <section id="login-section" class="login-hero">
+            <div class="hero-card">
+                <span class="hero-eyebrow">Welcome back</span>
+                <h1 class="hero-title">今天想吃什麼？</h1>
+                <p class="hero-desc">用公司 Google 帳號登入，瀏覽今日開放的餐廳並快速下單。</p>
+                <button id="custom-login-btn" class="btn-google">
+                    <span class="g-icon"></span>
+                    <span>使用 Google 帳號登入</span>
                 </button>
+                <p class="hero-foot">僅限公司授權成員使用</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+                <div class="blob blob-1"></div>
+                <div class="blob blob-2"></div>
+                <div class="blob blob-3"></div>
             </div>
         </section>
 
         <!-- 載入中 / 狀態提示 -->
-        <section id="status-section" class="hidden">
+        <section id="status-section" class="status hidden">
             <div class="loader"></div>
-            <p id="status-text">載入中...</p>
+            <p id="status-text" class="status-text">載入中…</p>
         </section>
 
-        <!-- 主應用程式區塊 (需登入且有權限) -->
-        <main id="app-section" class="hidden">
+        <!-- 主應用程式區塊 -->
+        <main id="app-section" class="app hidden" data-view="restaurants">
 
-            <!-- 管理員設定區塊 (僅管理員可見) -->
-            <section id="admin-section" class="card hidden">
-                <h3>👑 管理員設定</h3>
-                <div class="admin-controls">
-                    <button id="btn-open-config" class="btn btn-secondary">設定今日餐廳</button>
-                    <button id="btn-clear-orders" class="btn btn-danger">清空今日點餐</button>
-                </div>
-                <div id="admin-config-panel" class="hidden mt-3">
-                    <h4>選擇今日開放餐廳：</h4>
-                    <div id="restaurant-checkboxes" class="checkbox-group">
-                        <!-- JS 動態生成 -->
+            <!-- 管理員設定區塊 -->
+            <section id="admin-section" class="admin-panel hidden">
+                <div class="admin-head">
+                    <div>
+                        <span class="tag tag-gold">
+                            <svg class="icon icon-sm"><use href="#i-settings" /></svg>
+                            管理員
+                        </span>
+                        <h3 class="admin-title">今日餐廳設定</h3>
                     </div>
-                    <button id="btn-save-config" class="btn btn-primary mt-2">儲存設定</button>
+                    <div class="admin-controls">
+                        <button id="btn-open-config" class="btn btn-ghost">
+                            <svg class="icon icon-sm"><use href="#i-store" /></svg>
+                            設定餐廳
+                        </button>
+                        <button id="btn-clear-orders" class="btn btn-danger-ghost">
+                            <svg class="icon icon-sm"><use href="#i-trash" /></svg>
+                            清空訂單
+                        </button>
+                    </div>
+                </div>
+                <div id="admin-config-panel" class="admin-config hidden">
+                    <p class="admin-hint">勾選今天對外開放的餐廳：</p>
+                    <div id="restaurant-checkboxes" class="chip-group"></div>
+                    <button id="btn-save-config" class="btn btn-primary">
+                        <svg class="icon icon-sm"><use href="#i-check" /></svg>
+                        儲存設定
+                    </button>
                 </div>
             </section>
 
-            <!-- 今日菜單區塊 -->
-            <section id="menu-section">
-                <h2>📅 今日菜單 <span id="today-restaurants"></span></h2>
-                <div id="menu-container" class="grid-container">
-                    <!-- JS 動態生成餐點卡片 -->
-                    <p class="placeholder-text">今日尚未設定餐廳或菜單載入中...</p>
+            <!-- 第一步：餐廳選擇 -->
+            <section id="restaurants-view" class="view view-restaurants">
+                <div class="view-head">
+                    <span class="eyebrow">Step 1</span>
+                    <h2 class="view-title">選擇今日餐廳</h2>
+                    <p class="view-desc" id="restaurants-desc">正在載入今日開放的餐廳…</p>
                 </div>
+                <div id="restaurant-list" class="restaurant-grid">
+                    <!-- JS 動態生成 -->
+                </div>
+            </section>
+
+            <!-- 第二步：菜單 -->
+            <section id="menu-section" class="view view-menu hidden">
+                <div class="view-head menu-head">
+                    <button id="btn-back-restaurants" class="back-btn">
+                        <svg class="icon"><use href="#i-back" /></svg>
+                        <span>更換餐廳</span>
+                    </button>
+                    <div class="menu-head-text">
+                        <span class="eyebrow">Step 2</span>
+                        <h2 class="view-title"><span id="current-restaurant-name">—</span></h2>
+                        <p class="view-desc"><span id="menu-count">0</span> 道餐點可供選擇</p>
+                    </div>
+                </div>
+                <div id="menu-toolbar" class="menu-toolbar hidden">
+                    <label class="search-field" for="menu-search">
+                        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-search" /></svg>
+                        <input id="menu-search" type="search" placeholder="搜尋餐點名稱…" autocomplete="off"
+                            aria-label="搜尋餐點">
+                        <button id="menu-search-clear" class="search-clear hidden" type="button" aria-label="清除搜尋">
+                            <svg class="icon icon-sm"><use href="#i-close" /></svg>
+                        </button>
+                    </label>
+                    <div id="menu-categories" class="cat-filter" role="tablist" aria-label="分類篩選"></div>
+                </div>
+                <div id="menu-container" class="menu-list">
+                    <!-- JS 動態生成 -->
+                </div>
+                <p id="today-restaurants" class="sr-only"></p>
             </section>
         </main>
 
-        <!-- 訂單確認浮動視窗 / 底部區塊 -->
-        <section id="order-summary-section" class="hidden">
-            <!-- 用於顯示簡易結算或複製按鈕，可視需求擴充 -->
-            <button id="btn-show-orders" class="btn btn-info">查看今日訂單總覽</button>
+        <!-- 底部浮動訂單按鈕 -->
+        <section id="order-summary-section" class="fab-wrap hidden">
+            <button id="btn-show-orders" class="fab">
+                <svg class="icon"><use href="#i-cart" /></svg>
+                <span>今日訂單總覽</span>
+            </button>
         </section>
 
     </div>
 
     <!-- 訂單列表 Modal -->
-    <div id="orders-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>📋 今日訂單列表</h2>
-            <div class="table-wrapper">
-                <table id="orders-table">
-                    <thead>
-                        <tr>
-                            <th>時間</th>
-                            <th>訂購人</th>
-                            <th>餐廳</th>
-                            <th>餐點</th>
-                            <th>金額</th>
-                            <th>備註</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders-list">
-                        <!-- JS 動態生成 -->
-                    </tbody>
-                </table>
+    <div id="orders-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="orders-modal-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-sheet">
+            <header class="modal-head">
+                <div>
+                    <span class="eyebrow">Today</span>
+                    <h2 id="orders-modal-title" class="modal-title">今日訂單列表</h2>
+                </div>
+                <button class="icon-btn close-modal" aria-label="關閉">
+                    <svg class="icon"><use href="#i-close" /></svg>
+                </button>
+            </header>
+            <div class="modal-body">
+                <div class="table-wrapper">
+                    <table id="orders-table" class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th>訂購人</th>
+                                <th>餐廳</th>
+                                <th>餐點</th>
+                                <th class="num">金額</th>
+                                <th>備註</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-list"></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="modal-footer">
-                <p>總金額: <span id="total-amount">0</span> 元</p>
-                <button id="btn-copy-orders" class="btn btn-success">複製訂單文字 (Line)</button>
-            </div>
+            <footer class="modal-foot">
+                <div class="total-box">
+                    <span class="total-label">總金額</span>
+                    <span class="total-value">NT$ <span id="total-amount">0</span></span>
+                </div>
+                <button id="btn-copy-orders" class="btn btn-primary">
+                    <svg class="icon icon-sm"><use href="#i-copy" /></svg>
+                    複製到 Line
+                </button>
+            </footer>
         </div>
     </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
     <script src="all.js"></script>
 </body>
